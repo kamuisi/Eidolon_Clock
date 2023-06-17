@@ -98,12 +98,24 @@ public:
     long DayTime = 6000;
     long NightTime = 3000;
     long int TotalTime = 0;
+    int DifferentDay = 0;
     std::time_t PresentTime = std::time(0);
     std::tm *now = std::localtime(&PresentTime);
     EidolonTime.iHour = BaseTime.iHour - now->tm_hour + EidolonTime.iHour;
+    DifferentDay = FindNumberDifferentOfTwoDays(now);
+    if(now->tm_hour == 0)
+    {
+        EidolonTime.iHour -= 24 ;
+    }
+    std::cout << DifferentDay;
+    if(DifferentDay != 0)
+    {
+        EidolonTime.iHour-= DifferentDay*24;
+        
+    }
     EidolonTime.iMinute = BaseTime.iMinute - now->tm_min + EidolonTime.iMinute;
     EidolonTime.iSecond = BaseTime.iSecond - now->tm_sec + EidolonTime.iSecond;
-    TotalTime = EidolonTime.iHour * 3600 + EidolonTime.iMinute * 60 + EidolonTime.iSecond - 6 + FindNumberDifferentOfTwoDays(now)*24*3600;
+    TotalTime = EidolonTime.iHour * 3600 + EidolonTime.iMinute * 60 + EidolonTime.iSecond - 11 ;
     do
     {
         if (DayorNight == "day")
@@ -130,7 +142,7 @@ void CounterTime()
     do
     {
         std::cout << "\033[2J\033[1;1H";
-        std::cout << "Time until " << DayorNight << '\n';
+        std::cout << "Time until " << (DayorNight == "day" ? "night" : "day") << '\n';
         std::cout << EidolonTime.iHour << ':' << EidolonTime.iMinute << ':' << EidolonTime.iSecond << '\n';
         Sleep(1000);
         --EidolonTime;
@@ -143,14 +155,14 @@ void CounterTime()
                 EidolonTime.iHour = 1;
                 EidolonTime.iMinute = 39;
                 EidolonTime.iSecond = 59;
-                DayorNight.replace(DayorNight.begin(), DayorNight.end(), "night");
+                DayorNight.replace(DayorNight.begin(), DayorNight.end(), "day");
                 break;
             }
             case 1:
             {
                 EidolonTime.iMinute = 49;
                 EidolonTime.iSecond = 59;
-                DayorNight.replace(DayorNight.begin(), DayorNight.end(), "day");
+                DayorNight.replace(DayorNight.begin(), DayorNight.end(), "night");
                 break;
             }
             }
