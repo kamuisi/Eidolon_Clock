@@ -84,7 +84,7 @@ void Manager::CalculatePresentTime()
     }
     EidolonTime.iMinute = BaseTime.iMinute - now->tm_min + EidolonTime.iMinute;
     EidolonTime.iSecond = BaseTime.iSecond - now->tm_sec + EidolonTime.iSecond;
-    TotalTime = EidolonTime.iHour * 3600 + EidolonTime.iMinute * 60 + EidolonTime.iSecond - 21;
+    TotalTime = EidolonTime.iHour * 3600 + EidolonTime.iMinute * 60 + EidolonTime.iSecond - 26;
     do
     {
         if (DayorNight == "day")
@@ -124,18 +124,18 @@ void Manager::CounterTime()
     {
         switch (DayorNight == "day" ? 1 : 0)
         {
-        case 0:
-        {
-            EidolonTime.iHour = 1;
-            EidolonTime.iMinute = 39;
+       case 0:
+       {
+            EidolonTime.iHour = 0;
+            EidolonTime.iMinute = 49;
             EidolonTime.iSecond = 59;
             DayorNight.replace(DayorNight.begin(), DayorNight.end(), "day");
             break;
-        }
+       }
         case 1:
         {
-            EidolonTime.iHour = 0;
-            EidolonTime.iMinute = 49;
+            EidolonTime.iHour = 1;
+            EidolonTime.iMinute = 39;
             EidolonTime.iSecond = 59;
             DayorNight.replace(DayorNight.begin(), DayorNight.end(), "night");
             break;
