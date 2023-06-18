@@ -1,5 +1,21 @@
 #include "ClassManager.h"
 #include <cstdlib>
+Manager::Manager() : QWidget()
+{
+    Input();
+    CalculatePresentTime();
+    QString qstr = QString::fromStdString(GetTime());
+    LabelText = new QLabel(qstr);
+    QHBoxLayout *fitwidget = new QHBoxLayout;
+    fitwidget->addWidget(LabelText);
+    this->setLayout(fitwidget);
+    LabelText->setFont(QFont("Time New Roman", 20, 75));
+    LabelText->setAlignment(Qt::AlignCenter);
+    LabelText->setGeometry(0,0,300,100);
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this,SLOT(CounterTime()));
+    timer->start(1000);
+}
 void Manager::Input()
 {
     src.open("src.txt");
@@ -68,7 +84,7 @@ void Manager::CalculatePresentTime()
     }
     EidolonTime.iMinute = BaseTime.iMinute - now->tm_min + EidolonTime.iMinute;
     EidolonTime.iSecond = BaseTime.iSecond - now->tm_sec + EidolonTime.iSecond;
-    TotalTime = EidolonTime.iHour * 3600 + EidolonTime.iMinute * 60 + EidolonTime.iSecond - 13;
+    TotalTime = EidolonTime.iHour * 3600 + EidolonTime.iMinute * 60 + EidolonTime.iSecond - 21;
     do
     {
         if (DayorNight == "day")
@@ -82,43 +98,50 @@ void Manager::CalculatePresentTime()
             DayorNight.replace(DayorNight.begin(), DayorNight.end(), "day");
         }
     } while (TotalTime < 0);
+    std::time_t WasteTime = std::time(0);
+    std::tm *Waste = std::localtime(&WasteTime);
+    TotalTime -= (Waste->tm_hour - now->tm_hour)*3600 + (Waste->tm_min - now->tm_min)*60 + Waste->tm_sec - now->tm_sec;
     EidolonTime.iHour = TotalTime / 3600;
     EidolonTime.iMinute = TotalTime / 60 - EidolonTime.iHour * 60;
     EidolonTime.iSecond = TotalTime - EidolonTime.iHour * 3600 - EidolonTime.iMinute * 60;
-    TotalTime = (TotalTime - EidolonTime.iHour * 3600 - EidolonTime.iMinute * 60 - EidolonTime.iSecond) * 1000;
-    Sleep(TotalTime);
+    if(DayorNight == "day")
+    {
+        DayorNight.replace(DayorNight.begin(), DayorNight.end(), "night");
+    }
+    else
+    {
+       DayorNight.replace(DayorNight.begin(), DayorNight.end(), "day");
+    }
+}
+std::string Manager::GetTime()
+{
+    return "Time until " + DayorNight + '\n' + std::to_string(EidolonTime.iHour) + ':' + std::to_string(EidolonTime.iMinute) + ':' + std::to_string(EidolonTime.iSecond);
 }
 void Manager::CounterTime()
 {
-    Input();
-    CalculatePresentTime();
-    do
+    --EidolonTime;
+    if (EidolonTime.iHour == -1)
     {
-        system("cls"); 
-        std::cout << "Time until " << (DayorNight == "day" ? "night" : "day") << '\n';
-        std::cout << EidolonTime.iHour << ':' << EidolonTime.iMinute << ':' << EidolonTime.iSecond << '\n';
-        Sleep(1000);
-        --EidolonTime;
-        if (EidolonTime.iHour == -1)
+        switch (DayorNight == "day" ? 1 : 0)
         {
-            switch (DayorNight == "day" ? 1 : 0)
-            {
-            case 0:
-            {
-                EidolonTime.iHour = 1;
-                EidolonTime.iMinute = 39;
-                EidolonTime.iSecond = 59;
-                DayorNight.replace(DayorNight.begin(), DayorNight.end(), "day");
-                break;
-            }
-            case 1:
-            {
-                EidolonTime.iMinute = 49;
-                EidolonTime.iSecond = 59;
-                DayorNight.replace(DayorNight.begin(), DayorNight.end(), "night");
-                break;
-            }
-            }
+        case 0:
+        {
+            EidolonTime.iHour = 1;
+            EidolonTime.iMinute = 39;
+            EidolonTime.iSecond = 59;
+            DayorNight.replace(DayorNight.begin(), DayorNight.end(), "day");
+            break;
         }
-    } while (1 == 1);
+        case 1:
+        {
+            EidolonTime.iHour = 0;
+            EidolonTime.iMinute = 49;
+            EidolonTime.iSecond = 59;
+            DayorNight.replace(DayorNight.begin(), DayorNight.end(), "night");
+            break;
+        }
+        }
+    }
+    QString qstr = QString::fromStdString(GetTime());
+    LabelText->setText(qstr);
 }
