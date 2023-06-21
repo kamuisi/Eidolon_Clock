@@ -4,9 +4,6 @@
 class Time
 {
 private:
-    int iYear;
-    int iMonth;
-    int iDay;
     int iHour;
     int iMinute;
     int iSecond;
